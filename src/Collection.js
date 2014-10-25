@@ -1,11 +1,11 @@
 /**
- * This class provides methods to access or manipulate the data
- * in the database.
+ * This class represents a mongo collection and provides methods to access, 
+ * manipulate or insert documents.
  * 
  * @author Sam Verschueren      <sam.verschueren@gmail.com>
  * @since  24 Oct. 2014
  */
-var MongoTable = (function() {
+var Collection = (function() {
     'use strict';
 
     if(typeof _ === 'undefined') {
@@ -15,17 +15,24 @@ var MongoTable = (function() {
     }
 
     /**
-     * Creates a new mongo table
+     * Creates a new mongo collection
      * 
-     * @param String name The name of the table.
-     * @param Object data The data in the table.
+     * @param String name The name of the collection.
+     * @param Object data The data in the collection.
      */
-    function MongoTable(name, data) {
+    function Collection(name, data) {
         this._name = name;
-        this._data = JSON.parse(data);
+        this._data = data;
     };
 
-    MongoTable.prototype.find = function(where, callback) {
+    /**
+     * Finds all the documents in the collection that match the where
+     * statement.
+     * 
+     * @param  Object   where    The where statement object.
+     * @param  Function callback The callback function that will be called with the result when the data is retrieved.
+     */
+    Collection.prototype.find = function(where, callback) {
         if(!_.isObject(where)) {
             where = {_id: where};
         }
@@ -33,7 +40,13 @@ var MongoTable = (function() {
         callback(_.where(this._data, where));
     };
 
-    MongoTable.prototype.findOne = function(where, callback) {
+    /**
+     * Finds the first documet that matches the where clause.
+     * 
+     * @param  Object   where    The where statement object.
+     * @param  Function callback The callback function that will be called with the result when the data is retrieved.
+     */
+    Collection.prototype.findOne = function(where, callback) {
         if(!_.isObject(where)) {
             where = {_id: where};
         }
@@ -47,7 +60,7 @@ var MongoTable = (function() {
      * @param  Mixed    data     Document or array of documents that should be inserted.
      * @param  Function callback An optional callback if the data is inserted.
      */
-    MongoTable.prototype.insert = function(data, callback) {
+    Collection.prototype.insert = function(data, callback) {
         var dataArray = data;
 
         if(!_.isArray(data)) {
@@ -64,7 +77,7 @@ var MongoTable = (function() {
         }, this);
 
         // Update the localStorage object
-        window.localStorage[this._name] = JSON.stringify(this._data);
+        window.localStorage.setObject(this._name, this._data);
 
         // If we have a callback, call it
         if(callback) callback();
@@ -73,11 +86,11 @@ var MongoTable = (function() {
     /**
      * Clear the data out of the table.
      */
-    MongoTable.prototype.remove = function() {
+    Collection.prototype.remove = function() {
         this._data = [];
 
-        window.localStorage[this._name] = JSON.stringify(this._data);
+        window.localStorage.setObject(this._name, this._data);
     };
 
-    return MongoTable;
+    return Collection;
 })();

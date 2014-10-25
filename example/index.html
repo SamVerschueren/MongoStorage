@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MongoStorage Example</title>
+
+    <script type="text/javascript" src="../src/lodash.min.js"></script>
+    <script type="text/javascript" src="../src/MongoStorage.js"></script>
+    <script type="text/javascript" src="../src/Document.js"></script>
+
+    <script type="text/javascript">
+        window.localStorage.clear();
+
+        var db = new MongoStorage();
+        db.createCollection('users');
+
+        // Insert multiple documents at one or one document
+        db.users.insert([{firstName: 'Foo 1', name: 'Bar'}, {firstName: 'Foo 2', name: 'Bar'}]);
+        db.users.insert({firstName: 'Foo 3', name: 'Bar'});
+
+        db.users.find({name: 'Bar'}, function(data) {
+            console.log(data);
+        });
+    </script>
+</head>
+<body>
+
+<body>
+</html>
