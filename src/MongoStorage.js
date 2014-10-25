@@ -35,14 +35,3 @@ var MongoStorage = (function() {
 
     return MongoStorage;
 })();
-
-// Extension methods for the local storage
-Storage.prototype.setObject = function(key, value) {
-    this.setItem(key, JSON.stringify(value));
-};
-
-Storage.prototype.getObject = function(key) {
-    var item = this.getItem(key);
-
-    return item ? JSON.parse(item) : undefined;
-};

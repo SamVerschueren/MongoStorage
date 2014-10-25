@@ -70,7 +70,7 @@ var Collection = (function() {
         // Iterate over the array
         _.forEach(dataArray, function(item) {
             // Create an id
-            item._id = (new Date()).getTime() + '' + parseInt(Math.random()*100000);
+            item._id = new ObjectId().toString();
 
             // Push the item to the data stack
             this._data.push(item);

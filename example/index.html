@@ -5,7 +5,8 @@
 
     <script type="text/javascript" src="../src/lodash.min.js"></script>
     <script type="text/javascript" src="../src/MongoStorage.js"></script>
-    <script type="text/javascript" src="../src/Document.js"></script>
+    <script type="text/javascript" src="../src/Collection.js"></script>
+    <script type="text/javascript" src="../src/ObjectId.js"></script>
 
     <script type="text/javascript">
         window.localStorage.clear();
@@ -17,8 +18,8 @@
         db.users.insert([{firstName: 'Foo 1', name: 'Bar'}, {firstName: 'Foo 2', name: 'Bar'}]);
         db.users.insert({firstName: 'Foo 3', name: 'Bar'});
 
-        db.users.find({name: 'Bar'}, function(data) {
-            console.log(data);
+        db.users.findOne({name: 'Bar'}, function(data) {
+            console.log('The id is ' + data._id);
         });
     </script>
 </head>
