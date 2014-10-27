@@ -30,28 +30,109 @@ var Collection = (function() {
      * statement.
      * 
      * @param  Object   where    The where statement object.
+     * @param  Object   options  The options like to sort and all.
      * @param  Function callback The callback function that will be called with the result when the data is retrieved.
      */
-    Collection.prototype.find = function(where, callback) {
-        if(!_.isObject(where)) {
+    Collection.prototype.find = function(where, options, callback) {
+        if(_.isString(where)) {
             where = {_id: where};
         }
 
-        callback(_.where(this._data, where));
+        if(_.isFunction(where)) {
+            callback = where;
+            options = undefined;
+            where = {};
+        }
+
+        if(_.isFunction(options)) {
+            callback = options;
+            options = undefined;
+        }
+
+        var filtered = _.filter(_.values(this._data), compileDocumentSelector(where));
+
+        if(options && options.sort) {
+            filtered = filtered.sort(compileSort(options.sort));
+        }
+
+        callback(filtered);
     };
 
     /**
      * Finds the first documet that matches the where clause.
      * 
      * @param  Object   where    The where statement object.
+     * @param  Object   options  The options like to sort and all.
      * @param  Function callback The callback function that will be called with the result when the data is retrieved.
      */
-    Collection.prototype.findOne = function(where, callback) {
-        if(!_.isObject(where)) {
+    Collection.prototype.findOne = function(where, options, callback) {
+        if(_.isString(where)) {
             where = {_id: where};
         }
 
-        callback(_.find(this._data, where));
+        if(_.isFunction(where)) {
+            callback = where;
+            options = undefined;
+            where = {};
+        }
+
+        if(_.isFunction(options)) {
+            callback = options;
+            options = undefined;
+        }
+
+        var filtered = _.filter(_.values(this._data), compileDocumentSelector(where));
+
+        if(options && options.sort) {
+            filtered = filtered.sort(compileSort(options.sort));
+        }
+
+        callback(filtered[0]);
+    };
+
+    Collection.prototype.update = function(query, update, options, callback) {
+        if(_.isFunction(options)) {
+            callback = options;
+            options = undefined;
+        }
+
+        var self = this;
+
+        self.find(query, function(data) {
+            if(data.length == 0) {
+                // If no records where found, callback that no records where updated
+                return callback(0);
+            }
+
+            if(!options || !options.multi) {
+                // If multi is not set to true, only update the first record
+                data = [data[0]];
+            }
+
+            // Iterate over the resultset
+            _.each(data, function(doc) {
+                var id = doc._id;
+
+                if(update.$set) {
+                    // Update the document
+                    doc = _.extend(doc, update.$set);
+                }
+                if(update.$inc) {
+
+                }
+
+                // Make sure the original id was not overrided
+                doc._id = id;
+
+                var index = _.findIndex(self._data, {_id: id});
+
+                self._data[index] = doc;
+            });
+
+            window.localStorage.setObject(self._name, self._data);
+
+            callback(data.length);
+        });
     };
 
     /**
@@ -70,7 +151,7 @@ var Collection = (function() {
         // Iterate over the array
         _.forEach(dataArray, function(item) {
             // Create an id
-            item._id = new ObjectId().toString();
+            item._id = new ObjectId().toJSONValue();
 
             // Push the item to the data stack
             this._data.push(item);
@@ -85,11 +166,38 @@ var Collection = (function() {
 
     /**
      * Clear the data out of the table.
+     *
+     * @param  Object   query     Specifies deletion criteria using query operators
+     * @param  Function callback  The callback that will be called with the number of removed rows.
      */
-    Collection.prototype.remove = function() {
-        this._data = [];
+    Collection.prototype.remove = function(query, callback) {
+        if(_.isFunction(query)) {
+            callback = query;
+            query = undefined;
+        }
+
+        var result = this._data.length;
+
+        if(!query) {
+            this._data = [];
+        }
+        else {
+            var self = this;
+
+            this.find(query, function(documents) {
+                result = documents.length;
+
+                _.each(documents, function(doc) {
+                    var index = _.findIndex(self._data, {_id: doc._id});
+
+                    self._data.splice(index, 1);
+                }, this);
+            }, this);
+        }
 
         window.localStorage.setObject(this._name, this._data);
+
+        if(callback) callback(result);
     };
 
     return Collection;

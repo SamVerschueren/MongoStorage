@@ -69,6 +69,44 @@ describe('Collection', function() {
         });
     });
 
+    describe('#find()', function() {
+        beforeEach(function() {
+            db.users.insert([{firstName: 'Foo 1', name: 'Bar', age: 20}, {firstName: 'Foo 2', name: 'Bar', age: 25}]);
+        });
+
+        it('Should return all documents when an empty where clause is provided', function() {
+            db.users.find({}, function(users) {
+                expect(users).to.have.length(2);
+            });
+        });
+
+        it('Should return an array', function() {
+            db.users.find(function(users) {
+                expect(users).to.be.an.array;
+            });
+        });
+
+        it('Should accept where clause', function() {
+            db.users.find({firstName: 'Foo 1'}, function(users) {
+                expect(users).to.have.length(1);
+            });
+        });
+
+        it('Should be possible to order the data ascending', function() {
+            db.users.find({}, {sort: {age: 1}}, function(users) {
+                expect(users[0].age).to.be.equal(20);
+                expect(users[1].age).to.be.equal(25);
+            });
+        });
+
+        it('Should be possible to order the data descending', function() {
+            db.users.find({}, {sort: {age: -1}}, function(users) {
+                expect(users[0].age).to.be.equal(25);
+                expect(users[1].age).to.be.equal(20);
+            });
+        });
+    });
+
     describe('#findOne()', function() {
         beforeEach(function() {
             db.users.insert([{firstName: 'Foo 1', name: 'Bar'}, {firstName: 'Foo 2', name: 'Bar'}]);
@@ -92,10 +130,28 @@ describe('Collection', function() {
             db.users.insert([{firstName: 'Foo 1', name: 'Bar'}, {firstName: 'Foo 2', name: 'Bar'}]);
         });
 
-        it('Should clear the collection', function() {
+        it('Should remove all documents if no parameters are provided', function() {
             db.users.remove();
 
             expect(localStorage.getObject('users')).to.be.empty;
+        });
+
+        it('Should remove all the documents if only the callback is provided', function() {
+            db.users.remove(function() {
+                expect(localStorage.getObject('users')).to.be.empty;
+            });
+        });
+
+        it('Should return the number of deleted rows', function() {
+            db.users.remove(function(rows) {
+                expect(rows).to.be.equal(2);
+            });  
+        });
+
+        it('Should remove the documents that match the criteria', function() {
+            db.users.remove({firstName: 'Foo 1'}, function() {
+                expect(localStorage.getObject('users')).to.have.length(1);
+            });
         });
     });
 });

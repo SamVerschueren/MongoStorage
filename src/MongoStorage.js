@@ -28,6 +28,10 @@ var MongoStorage = (function() {
      * @param  String name The name of the collection.
      */
     MongoStorage.prototype.createCollection = function(name) {
+        if(window.localStorage.getObject(name) !== undefined) {
+            throw { errmsg: 'collection already exists', 'ok' : 0 };
+        }
+
         window.localStorage.setObject(name, []);
 
         this[name] = new Collection(name, []);

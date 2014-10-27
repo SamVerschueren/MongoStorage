@@ -6,11 +6,11 @@
  * @since  25 Oct. 2014
  */
 Storage.prototype.setObject = function(key, value) {
-    this.setItem(key, JSON.stringify(value));
+    this.setItem(key, EJSON.stringify(value));
 };
 
 Storage.prototype.getObject = function(key) {
     var item = this.getItem(key);
 
-    return item ? JSON.parse(item) : undefined;
+    return item ? EJSON.parse(item) : undefined;
 };

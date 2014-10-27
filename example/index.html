@@ -3,24 +3,36 @@
 <head>
     <title>MongoStorage Example</title>
 
+    <script type="text/javascript" src="../src/Selector.js"></script>
+    <script type="text/javascript" src="../src/EJSON.js"></script>  
+
     <script type="text/javascript" src="../src/lodash.min.js"></script>
     <script type="text/javascript" src="../src/MongoStorage.js"></script>
     <script type="text/javascript" src="../src/Collection.js"></script>
     <script type="text/javascript" src="../src/ObjectId.js"></script>
-    <script type="text/javascript" src="../src/LocalStorage.Extension.js"></script>
+    <script type="text/javascript" src="../src/LocalStorage.Extension.js"></script>  
 
     <script type="text/javascript">
-        window.localStorage.clear();
+        //window.localStorage.clear();
 
         var db = new MongoStorage();
-        db.createCollection('users');
+        //db.createCollection('users');
 
         // Insert multiple documents at one or one document
-        db.users.insert([{firstName: 'Foo 1', name: 'Bar'}, {firstName: 'Foo 2', name: 'Bar'}]);
-        db.users.insert({firstName: 'Foo 3', name: 'Bar'});
+        //db.users.insert([{firstName: 'Foo 1', name: 'Bar', age: 24}, {firstName: 'Foo 2', name: 'Bar', age: 26}]);
+        // db.users.insert({firstName: 'Foo 3', name: 'Bar', age: 18});
 
-        db.users.findOne({name: 'Bar'}, function(data) {
-            console.log('The id is ' + data._id);
+        // db.users.find({name: 'Bar'}, {sort: {age: -1}}, function(data) {
+        //     console.log(JSON.stringify(data));
+        // });
+        // 
+        
+        db.users.update({name: 'Bar'}, {$set: {age: 35}}, function(nrUpdated) {
+            console.log(nrUpdated);
+        });
+
+        db.users.find(function(data) {
+            console.log(data);
         });
     </script>
 </head>
