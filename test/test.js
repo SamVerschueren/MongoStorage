@@ -130,27 +130,40 @@ describe('Collection', function() {
             db.users.insert([{firstName: 'Foo 1', name: 'Bar'}, {firstName: 'Foo 2', name: 'Bar'}]);
         });
 
-        it('Should remove all documents if no parameters are provided', function() {
-            db.users.remove();
+        describe('remove()', function() {
+            it('Should remove all documents', function() {
+                db.users.remove();
 
-            expect(localStorage.getObject('users')).to.be.empty;
-        });
-
-        it('Should remove all the documents if only the callback is provided', function() {
-            db.users.remove(function() {
                 expect(localStorage.getObject('users')).to.be.empty;
             });
         });
 
-        it('Should return the number of deleted rows', function() {
-            db.users.remove(function(rows) {
-                expect(rows).to.be.equal(2);
-            });  
+        describe("remove(callback)", function() {
+            it('Should remove all documents', function() {
+                db.users.remove(function() {
+                    expect(localStorage.getObject('users')).to.be.empty;
+                });
+            });
+
+            it('Should return the number of deleted rows', function() {
+                db.users.remove(function(rows) {
+                    expect(rows).to.be.equal(2);
+                });  
+            });
         });
 
-        it('Should remove the documents that match the criteria', function() {
-            db.users.remove({firstName: 'Foo 1'}, function() {
-                expect(localStorage.getObject('users')).to.have.length(1);
+        describe('remove(query, callback)', function() {
+            it('Should remove the documents that match the criteria', function() {
+                db.users.remove({firstName: 'Foo 1'}, function() {
+                    expect(localStorage.getObject('users')).to.have.length(1);
+                });
+            });
+
+            it('Should return the number of delete rows', function() {
+                db.users.remove({firstName: 'Foo 1'}, function(rows) {
+                    expect(localStorage.getObject('users')).to.have.length(1);
+                    expect(rows).to.be.equal(1);
+                });
             });
         });
     });
