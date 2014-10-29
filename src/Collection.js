@@ -34,10 +34,6 @@ var Collection = (function() {
      * @param  Function callback The callback function that will be called with the result when the data is retrieved.
      */
     Collection.prototype.find = function(where, options, callback) {
-        if(_.isString(where)) {
-            where = {_id: where};
-        }
-
         if(_.isFunction(where)) {
             callback = where;
             options = undefined;
@@ -52,7 +48,7 @@ var Collection = (function() {
         var filtered = _.filter(_.values(this._data), compileDocumentSelector(where));
 
         if(options && options.sort) {
-            filtered = filtered.sort(compileSort(options.sort));
+            filtered = filtered.sort(Collection._compileSort(options.sort));
         }
 
         callback(filtered);
@@ -66,10 +62,6 @@ var Collection = (function() {
      * @param  Function callback The callback function that will be called with the result when the data is retrieved.
      */
     Collection.prototype.findOne = function(where, options, callback) {
-        if(_.isString(where)) {
-            where = {_id: where};
-        }
-
         if(_.isFunction(where)) {
             callback = where;
             options = undefined;
@@ -84,55 +76,75 @@ var Collection = (function() {
         var filtered = _.filter(_.values(this._data), compileDocumentSelector(where));
 
         if(options && options.sort) {
-            filtered = filtered.sort(compileSort(options.sort));
+            filtered = filtered.sort(Collection._compileSort(options.sort));
         }
 
         callback(filtered[0]);
     };
 
+    /**
+     * Modifies an existing document or documents in a collection. The method can modify specific fields 
+     * of an existing document or documents or replace an existing document entirely, depending on the 
+     * update parameter.
+     *
+     * By default, the update() method updates a single document. Set the Multi Parameter to update all 
+     * documents that match the query criteria.
+     * 
+     * @param  Object   query    The selection criteria for the update. Use the same query selectors as used in the find() method.
+     * @param  Object   update   The modifications to apply.
+     * @param  Object   options  Extra options like upsert or multi.
+     * @param  Function callback The function that is called when the update was completed with the number of updated documents.
+     */
     Collection.prototype.update = function(query, update, options, callback) {
         if(_.isFunction(options)) {
             callback = options;
-            options = undefined;
+            options = {};
         }
 
-        var self = this;
+        var self = this,
+            updatedDocuments = 0;
 
-        self.find(query, function(data) {
-            if(data.length == 0) {
-                // If no records where found, callback that no records where updated
-                return callback(0);
-            }
-
+        self.find(query, function(documents) {
             if(!options || !options.multi) {
                 // If multi is not set to true, only update the first record
-                data = [data[0]];
+                documents = documents.length == 0 ? [] : [documents[0]];
             }
 
-            // Iterate over the resultset
-            _.each(data, function(doc) {
-                var id = doc._id;
+            _.forEach(documents, function(doc) {
+                Collection._modify(doc, update, options);
 
-                if(update.$set) {
-                    // Update the document
-                    doc = _.extend(doc, update.$set);
-                }
-                if(update.$inc) {
-
-                }
-
-                // Make sure the original id was not overrided
-                doc._id = id;
-
-                var index = _.findIndex(self._data, {_id: id});
+                var index = _.findIndex(self._data, {_id: doc._id});
 
                 self._data[index] = doc;
+
+                window.localStorage.setObject(self._name, self._data);
+
+                ++updatedDocuments;
             });
+        });
+
+        // If we are here, we did not update any documents yet, we should check for an upsert
+        if(updatedDocuments == 0 && options.upsert) {
+            // TODO remove dollar operators
+            var newDoc = query;
+            Collection._modify(newDoc, update, {isInsert: true});
+
+            // Create an id
+            try {
+                newDoc._id = new ObjectId(newDoc._id).toJSONValue();
+            }
+            catch(e) {
+                newDoc._id = new ObjectId().toJSONValue();
+            }
+
+            self._data.push(newDoc);
 
             window.localStorage.setObject(self._name, self._data);
 
-            callback(data.length);
-        });
+            updatedDocuments = 1;
+        }
+
+        if(callback) callback(updatedDocuments);
     };
 
     /**
@@ -202,3 +214,6 @@ var Collection = (function() {
 
     return Collection;
 })();
+
+if(typeof module !== 'undefined') 
+    module.exports = Collection;

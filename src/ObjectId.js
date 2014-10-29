@@ -26,7 +26,7 @@ var ObjectId = (function() {
         else {
             hexString = hexString.toLowerCase();
 
-            if(this._isObjectId(hexString)) {
+            if(!this._isObjectId(hexString)) {
                 throw new Error('Could not parse ' + hexString + ' as a hexadecimal string');
             }
 
@@ -37,7 +37,7 @@ var ObjectId = (function() {
     };
 
     ObjectId.prototype._isObjectId = function(str) {
-        return str.length === 24 && str.match(/^[0-9a-f]*$/);
+        return str.length === 24 && !!str.match(/^[0-9a-f]*$/);
     };
 
     ObjectId.prototype.getTimestamp = function() {

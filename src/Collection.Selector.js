@@ -20,8 +20,6 @@ licenses, included below:
 
 */
 
-LocalCollection = {};
-
 // Like _.isArray, but doesn't regard polyfilled Uint8Arrays on old browsers as
 // arrays.
 var isArray = function (x) {
@@ -87,7 +85,7 @@ var compileValueSelector = function (valueSelector) {
       if (!isArray(value))
         return false;
       return _anyIfArrayPlus(value, function (x) {
-        return LocalCollection._f._equal(valueSelector, x);
+        return Collection._f._equal(valueSelector, x);
       });
     };
   }
@@ -112,7 +110,7 @@ var compileValueSelector = function (valueSelector) {
   // selector.
   return function (value) {
     return _anyIfArray(value, function (x) {
-      return LocalCollection._f._equal(valueSelector, x);
+      return Collection._f._equal(valueSelector, x);
     });
   };
 };
@@ -172,7 +170,7 @@ var VALUE_OPERATORS = {
     return function (value) {
       return _anyIfArrayPlus(value, function (x) {
         return _.any(operand, function (operandElt) {
-          return LocalCollection._f._equal(operandElt, x);
+          return Collection._f._equal(operandElt, x);
         });
       });
     };
@@ -186,7 +184,7 @@ var VALUE_OPERATORS = {
         return false;
       return _.all(operand, function (operandElt) {
         return _.any(value, function (valueElt) {
-          return LocalCollection._f._equal(operandElt, valueElt);
+          return Collection._f._equal(operandElt, valueElt);
         });
       });
     };
@@ -195,7 +193,7 @@ var VALUE_OPERATORS = {
   "$lt": function (operand) {
     return function (value) {
       return _anyIfArray(value, function (x) {
-        return LocalCollection._f._cmp(x, operand) < 0;
+        return Collection._f._cmp(x, operand) < 0;
       });
     };
   },
@@ -203,7 +201,7 @@ var VALUE_OPERATORS = {
   "$lte": function (operand) {
     return function (value) {
       return _anyIfArray(value, function (x) {
-        return LocalCollection._f._cmp(x, operand) <= 0;
+        return Collection._f._cmp(x, operand) <= 0;
       });
     };
   },
@@ -211,7 +209,7 @@ var VALUE_OPERATORS = {
   "$gt": function (operand) {
     return function (value) {
       return _anyIfArray(value, function (x) {
-        return LocalCollection._f._cmp(x, operand) > 0;
+        return Collection._f._cmp(x, operand) > 0;
       });
     };
   },
@@ -219,7 +217,7 @@ var VALUE_OPERATORS = {
   "$gte": function (operand) {
     return function (value) {
       return _anyIfArray(value, function (x) {
-        return LocalCollection._f._cmp(x, operand) >= 0;
+        return Collection._f._cmp(x, operand) >= 0;
       });
     };
   },
@@ -227,7 +225,7 @@ var VALUE_OPERATORS = {
   "$ne": function (operand) {
     return function (value) {
       return ! _anyIfArrayPlus(value, function (x) {
-        return LocalCollection._f._equal(x, operand);
+        return Collection._f._equal(x, operand);
       });
     };
   },
@@ -274,7 +272,7 @@ var VALUE_OPERATORS = {
       // Definitely not _anyIfArrayPlus: $type: 4 only matches arrays that have
       // arrays as elements according to the Mongo docs.
       return _anyIfArray(value, function (x) {
-        return LocalCollection._f._type(x) === operand;
+        return Collection._f._type(x) === operand;
       });
     };
   },
@@ -345,7 +343,7 @@ var VALUE_OPERATORS = {
 };
 
 // helpers used by compiled selector code
-LocalCollection._f = {
+Collection._f = {
   // XXX for _all and _in, consider building 'inquery' at compile time..
 
   _type: function (v) {
@@ -424,10 +422,10 @@ LocalCollection._f = {
       return b === undefined ? 0 : -1;
     if (b === undefined)
       return 1;
-    var ta = LocalCollection._f._type(a);
-    var tb = LocalCollection._f._type(b);
-    var oa = LocalCollection._f._typeorder(ta);
-    var ob = LocalCollection._f._typeorder(tb);
+    var ta = Collection._f._type(a);
+    var tb = Collection._f._type(b);
+    var oa = Collection._f._typeorder(ta);
+    var ob = Collection._f._typeorder(tb);
     if (oa !== ob)
       return oa < ob ? -1 : 1;
     if (ta !== tb)
@@ -461,7 +459,7 @@ LocalCollection._f = {
         }
         return ret;
       };
-      return LocalCollection._f._cmp(to_array(a), to_array(b));
+      return Collection._f._cmp(to_array(a), to_array(b));
     }
     if (ta === 4) { // Array
       for (var i = 0; ; i++) {
@@ -469,7 +467,7 @@ LocalCollection._f = {
           return (i === b.length) ? 0 : -1;
         if (i === b.length)
           return 1;
-        var s = LocalCollection._f._cmp(a[i], b[i]);
+        var s = Collection._f._cmp(a[i], b[i]);
         if (s !== 0)
           return s;
       }
@@ -511,8 +509,8 @@ LocalCollection._f = {
 
 // For unit tests. True if the given document matches the given
 // selector.
-LocalCollection._matches = function (selector, doc) {
-  return (LocalCollection._compileSelector(selector))(doc);
+Collection._matches = function (selector, doc) {
+  return (Collection._compileSelector(selector))(doc);
 };
 
 // _makeLookupFunction(key) returns a lookup function.
@@ -532,7 +530,7 @@ LocalCollection._matches = function (selector, doc) {
 //                                 {x: [2]},
 //                                 {y: 3}]})
 //   returns [1, [2], undefined]
-LocalCollection._makeLookupFunction = function (key) {
+Collection._makeLookupFunction = function (key) {
   var dotLocation = key.indexOf('.');
   var first, lookupRest, nextIsNumeric;
   if (dotLocation === -1) {
@@ -540,7 +538,7 @@ LocalCollection._makeLookupFunction = function (key) {
   } else {
     first = key.substr(0, dotLocation);
     var rest = key.substr(dotLocation + 1);
-    lookupRest = LocalCollection._makeLookupFunction(rest);
+    lookupRest = Collection._makeLookupFunction(rest);
     // Is the next (perhaps final) piece numeric (ie, an array lookup?)
     nextIsNumeric = /^\d+(\.|$)/.test(rest);
   }
@@ -584,7 +582,7 @@ var compileDocumentSelector = function (docSelector) {
         throw new Error("Unrecognized logical operator: " + key);
       perKeySelectors.push(LOGICAL_OPERATORS[key](subSelector));
     } else {
-      var lookUpByIndex = LocalCollection._makeLookupFunction(key);
+      var lookUpByIndex = Collection._makeLookupFunction(key);
       var valueSelectorFunc = compileValueSelector(subSelector);
       perKeySelectors.push(function (doc) {
         var branchValues = lookUpByIndex(doc);
@@ -607,13 +605,13 @@ var compileDocumentSelector = function (docSelector) {
 // Given a selector, return a function that takes one argument, a
 // document, and returns true if the document matches the selector,
 // else false.
-LocalCollection._compileSelector = function (selector) {
+Collection._compileSelector = function (selector) {
   // you can pass a literal function instead of a selector
   if (selector instanceof Function)
     return function (doc) {return selector.call(doc);};
 
   // shorthand -- scalars match _id
-  if (LocalCollection._selectorIsId(selector)) {
+  if (Collection._selectorIsId(selector)) {
     return function (doc) {
       return EJSON.equals(doc._id, selector);
     };
@@ -646,19 +644,19 @@ LocalCollection._compileSelector = function (selector) {
 // first object comes first in order, 1 if the second object comes
 // first, or 0 if neither object comes before the other.
 
-var compileSort = LocalCollection._compileSort = function (spec) {
+Collection._compileSort = function (spec) {
   var sortSpecParts = [];
 
   if (spec instanceof Array) {
     for (var i = 0; i < spec.length; i++) {
       if (typeof spec[i] === "string") {
         sortSpecParts.push({
-          lookup: LocalCollection._makeLookupFunction(spec[i]),
+          lookup: Collection._makeLookupFunction(spec[i]),
           ascending: true
         });
       } else {
         sortSpecParts.push({
-          lookup: LocalCollection._makeLookupFunction(spec[i][0]),
+          lookup: Collection._makeLookupFunction(spec[i][0]),
           ascending: spec[i][1] !== "desc"
         });
       }
@@ -666,7 +664,7 @@ var compileSort = LocalCollection._compileSort = function (spec) {
   } else if (typeof spec === "object") {
     for (var key in spec) {
       sortSpecParts.push({
-        lookup: LocalCollection._makeLookupFunction(key),
+        lookup: Collection._makeLookupFunction(key),
         ascending: spec[key] >= 0
       });
     }
@@ -706,7 +704,7 @@ var compileSort = LocalCollection._compileSort = function (spec) {
           // Compare the value we found to the value we found so far, saving it
           // if it's less (for an ascending sort) or more (for a descending
           // sort).
-          var cmp = LocalCollection._f._cmp(reduced, value);
+          var cmp = Collection._f._cmp(reduced, value);
           if ((findMin && cmp > 0) || (!findMin && cmp < 0))
             reduced = value;
         }
@@ -720,7 +718,7 @@ var compileSort = LocalCollection._compileSort = function (spec) {
       var specPart = sortSpecParts[i];
       var aValue = reduceValue(specPart.lookup(a), specPart.ascending);
       var bValue = reduceValue(specPart.lookup(b), specPart.ascending);
-      var compare = LocalCollection._f._cmp(aValue, bValue);
+      var compare = Collection._f._cmp(aValue, bValue);
       if (compare !== 0)
         return specPart.ascending ? compare : -compare;
     };

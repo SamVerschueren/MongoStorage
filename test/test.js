@@ -15,16 +15,24 @@ describe('Database', function() {
     });
 
     describe('#createCollection()', function() {
-        it('Should create the collection in the database', function() {
+
+        it('Should create a collection in the database', function() {
             db.createCollection('users');
 
             expect(localStorage.getObject('users')).to.exist;
         });
 
-        it('Should create an empty collection', function() {
+        it('Should create an empty collection in the database', function() {
             db.createCollection('users');
 
             expect(localStorage.getObject('users')).to.be.empty;
+        });
+
+        it('Should throw an error if ran twice', function() {
+            function fn() { db.createCollection('users'); }
+
+            fn();
+            expect(fn).to.throw;
         });
     });
 });
