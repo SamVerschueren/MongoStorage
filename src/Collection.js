@@ -36,13 +36,13 @@ var Collection = (function() {
     Collection.prototype.find = function(where, options, callback) {
         if(_.isFunction(where)) {
             callback = where;
-            options = undefined;
+            options = {};
             where = {};
         }
 
         if(_.isFunction(options)) {
             callback = options;
-            options = undefined;
+            options = {};
         }
 
         var filtered = _.filter(_.values(this._data), compileDocumentSelector(where));
@@ -50,8 +50,11 @@ var Collection = (function() {
         if(options && options.sort) {
             filtered = filtered.sort(Collection._compileSort(options.sort));
         }
+        
+        var start = options.skip || 0,
+            end = options.limit ? (options.limit + start) : filtered.length;
 
-        callback(filtered);
+        callback(filtered.slice(start, end));
     };
 
     /**
