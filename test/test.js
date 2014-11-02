@@ -202,6 +202,14 @@ describe('Collection', function() {
             });
         });
     });
+
+    describe('#drop()', function() {
+        it('Should drop the users collection from the database', function() {
+            db.users.drop(function() {
+                expect(window.localStorage['users']).to.not.exist;
+            });
+        });
+    });
 });
 
 describe('Query Operators', function() {

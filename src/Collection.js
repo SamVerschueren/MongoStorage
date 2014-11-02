@@ -232,6 +232,17 @@ var Collection = (function() {
         });
     };
 
+    /**
+     * Removes a collection from the database.
+     * 
+     * @param  Function callback Optional callback that will be called after the collection has been dropped.
+     */
+    Collection.prototype.drop = function(callback) {
+        window.localStorage.removeItem(this._name);
+
+        if(callback) callback();
+    };
+
     return Collection;
 })();
 
