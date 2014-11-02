@@ -176,3 +176,199 @@ describe('Collection', function() {
         });
     });
 });
+
+describe('Query Operators', function() {
+    beforeEach(function() {
+        localStorage.clear();
+
+        db.createCollection('users');
+
+        db.users.insert([
+            {
+                firstName: 'Foo 3',
+                name: 'Bar',
+                age: 16,
+                hobbies: ['Soccer', 'Cycling', 'Climbing']
+            },
+            {
+                firstName: 'Foo 1',
+                name: 'Bar',
+                age: 25,
+                hobbies: ['Soccer', 'Swimming']
+            },
+            {
+                firstName: 'Foo 2',
+                name: 'Bar',
+                age: 36,
+                hobbies: ['Swimming', 'Cycling']
+            }
+        ]);
+    });
+
+    describe('Comparison Query Operators', function() {
+
+        describe('$gt', function() {
+            it('Should return 0 users with an age greater then 36', function() {
+                db.users.find({age: {$gt: 36}}, function(users) {
+                    expect(users).to.be.empty;
+                });
+            });
+
+            it('Should return 1 users with an age greater then 35', function() {
+                db.users.find({age: {$gt: 35}}, function(users) {
+                    expect(users).to.have.length(1);
+                });
+            });
+
+            it('Should return 1 user with an age greater then 25', function() {
+                db.users.find({age: {$gt: 25}}, function(users) {
+                    expect(users).to.have.length(1);
+                });
+            });
+
+            it('Should return 2 users with an age greater then 24', function() {
+                db.users.find({age: {$gt: 24}}, function(users) {
+                    expect(users).to.have.length(2);
+                });
+            });
+        });
+
+        describe('$gte', function() {
+            it('Should return 0 users with an age greater then or equal to 37', function() {
+                db.users.find({age: {$gte: 37}}, function(users) {
+                    expect(users).to.be.empty;
+                });
+            });
+
+            it('Should return 1 users with an age greater then or equal to 36', function() {
+                db.users.find({age: {$gte: 36}}, function(users) {
+                    expect(users).to.have.length(1);;
+                });
+            });
+
+            it('Should return 1 users with an age greater then or equal to 35', function() {
+                db.users.find({age: {$gte: 35}}, function(users) {
+                    expect(users).to.have.length(1);
+                });
+            });
+
+            it('Should return 2 users with an age greater then or equal to 25', function() {
+                db.users.find({age: {$gte: 25}}, function(users) {
+                    expect(users).to.have.length(2);
+                });
+            });
+
+            it('Should return 2 users with an age greater then or equal to 24', function() {
+                db.users.find({age: {$gte: 24}}, function(users) {
+                    expect(users).to.have.length(2);
+                });
+            });
+        });
+
+        describe('$lt', function() {
+            it('Should return 0 users with an age less then 16', function() {
+                db.users.find({age: {$lt: 16}}, function(users) {
+                    expect(users).to.be.empty;
+                });
+            });
+
+            it('Should return 1 user with an age less then 17', function() {
+                db.users.find({age: {$lt: 17}}, function(users) {
+                    expect(users).to.have.length(1);
+                });
+            });
+
+            it('Should return 2 users with an age less then 30', function() {
+                db.users.find({age: {$lt: 30}}, function(users) {
+                    expect(users).to.have.length(2);
+                });
+            });
+
+            it('Should return 3 users with an age less then 37', function() {
+                db.users.find({age: {$lt: 37}}, function(users) {
+                    expect(users).to.have.length(3);
+                });
+            });
+        });
+
+        describe('$lte', function() {
+            it('Should return 0 users with an age less then or equal to 14', function() {
+                db.users.find({age: {$lte: 14}}, function(users) {
+                    expect(users).to.be.empty;
+                });
+            });
+
+            it('Should return 1 user with an age less then or equal to 16', function() {
+                db.users.find({age: {$lte: 16}}, function(users) {
+                    expect(users).to.have.length(1);
+                });
+            });
+
+            it('Should return 2 users with an age less then or equal to 30', function() {
+                db.users.find({age: {$lte: 30}}, function(users) {
+                    expect(users).to.have.length(2);
+                });
+            });
+
+            it('Should return 3 users with an age less then or equal to 36', function() {
+                db.users.find({age: {$lte: 36}}, function(users) {
+                    expect(users).to.have.length(3);
+                });
+            });
+        });
+
+        describe('$ne', function() {
+            it('Should return 2 users with an age not equal to 16', function() {
+                db.users.find({age: {$ne: 16}}, function(users) {
+                    expect(users).to.have.length(2);
+                });
+            });
+
+            it('Should return 3 users with an age not equal to 20', function() {
+                db.users.find({age: {$ne: 20}}, function(users) {
+                    expect(users).to.have.length(3);
+                });
+            }); 
+        });
+
+        describe('$in', function() {
+            it('Should return 0 users with hobby dancing or drawing', function() {
+                db.users.find({hobbies: {$in: ['Dancing', 'Drawing']}}, function(users) {
+                    expect(users).to.be.empty;
+                });
+            });
+
+            it('Should return 1 user with hobby climbing or drawing', function() {
+                db.users.find({hobbies: {$in: ['Climbing', 'Drawing']}}, function(users) {
+                    expect(users).to.have.length(1);
+                });
+            });
+
+            it('Should return 2 users with hobby cycling or dancing', function() {
+                db.users.find({hobbies: {$in: ['Cycling', 'Dancing']}}, function(users) {
+                    expect(users).to.have.length(2);
+                });
+            });
+
+            it('Should return 3 users with hobby swimming or climbing', function() {
+                db.users.find({hobbies: {$in: ['Swimming', 'Climbing']}}, function(users) {
+                    expect(users).to.have.length(3);
+                });
+            });
+        });
+
+        describe('$nin', function() {
+            it('Should return 0 users that don\'t swim or climb', function() {
+                db.users.find({hobbies: {$nin: ['Swimming', 'Climbing']}}, function(users) {
+                    expect(users).to.be.empty;
+                });
+            });
+
+            it('Should return 1 user that don\'t swim', function() {
+                db.users.find({hobbies: {$nin: ['Swimming']}}, function(users) {
+                    expect(users).to.have.length(1);
+                });
+            });
+        });
+    });
+});
