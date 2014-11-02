@@ -175,6 +175,33 @@ describe('Collection', function() {
             });
         });
     });
+
+    describe('#count()', function() {
+        beforeEach(function() {
+            db.users.insert([
+                {
+                    firstName: 'Foo 1',
+                    name: 'Bar'
+                }, 
+                {
+                    firstName: 'Foo 2',
+                    name: 'Bar'
+                }
+            ]);
+        });
+
+        it('Should return all users when no query is provided', function() {
+            db.users.count(function(count) {
+                expect(count).to.be.equal(2);
+            });
+        });
+
+        it('Should return 1 user with firstname Foo 1', function() {
+            db.users.count({firstName: 'Foo 1'}, function(count) {
+                expect(count).to.be.equal(1);
+            });
+        });
+    });
 });
 
 describe('Query Operators', function() {

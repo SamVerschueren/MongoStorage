@@ -215,6 +215,23 @@ var Collection = (function() {
         if(callback) callback(result);
     };
 
+    /**
+     * Returns the count of documents that would match a find() query.
+     * 
+     * @param  Object   query    The query selection criteria.
+     * @param  Function callback Called when the number of documents are found with the count as parameter.
+     */
+    Collection.prototype.count = function(query, callback) {
+        if(_.isFunction(query)) {
+            callback = query;
+            query = {};
+        }
+
+        this.find(query, function(result) {
+            callback(result.length);
+        });
+    };
+
     return Collection;
 })();
 
