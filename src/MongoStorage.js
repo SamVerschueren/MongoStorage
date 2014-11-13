@@ -17,8 +17,18 @@ var MongoStorage = (function() {
      * Creates the database
      */
     function MongoStorage() {
+        
+    };
+
+    MongoStorage.prototype.use = function(database) {
+        this._database = database;
+
         for(var name in window.localStorage) {
-            this[name] = new Collection(name, window.localStorage.getObject(name));
+            if(name.indexOf(this._database) === 0) {
+                console.log(name.substring(this._database.length+1));
+
+                this[name.substring(this._database.length+1)] = new Collection(name, window.localStorage.getObject(name));
+            }
         }
     };
 
@@ -28,13 +38,19 @@ var MongoStorage = (function() {
      * @param  String name The name of the collection.
      */
     MongoStorage.prototype.createCollection = function(name) {
-        if(window.localStorage.getObject(name) !== undefined) {
+        if(this._database === undefined) {
+            throw { errmsg: 'no database selected', 'ok': 0 };
+        }
+
+        var fullName = this._database + '.' + name;
+
+        if(window.localStorage.getObject(fullName) !== undefined) {
             throw { errmsg: 'collection already exists', 'ok' : 0 };
         }
 
-        window.localStorage.setObject(name, []);
+        window.localStorage.setObject(fullName, []);
 
-        this[name] = new Collection(name, []);
+        this[name] = new Collection(fullName, []);
     };
 
     return MongoStorage;

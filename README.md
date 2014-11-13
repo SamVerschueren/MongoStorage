@@ -1,8 +1,47 @@
 # MongoStorage
 
-This library is a work-in-progress for a client-side MongoDB implementation.
+This library is work-in-progress for a client-side MongoDB implementation.
+
+## Table of contents
+
+* [Database](#database)
+    * [use()](#use)
+    * [createCollection()](#createcollection)
+* [Collection](#collection)
+    * [insert()](#insert)
+    * [update()](#update)
+    * [find()](#find)
+    * [findOne()](#findone)
+    * [remove()](#remove)
+    * [count()](#count)
+    * [drop()](#drop)
+* [Query Operators](#query-operators)
+    * [Comparison Query Operators](#comparison-query-operators)
+        * [$gt](#gt)
+        * [$gte](#gte)
+        * [$lt](#lt)
+        * [$lte](#lte)
+        * [$ne](#ne)
+        * [$ni](#ni)
+        * [$nin](#nin)
+    * [Logical Query Operators](#logical-query-operators)
+        * [$and](#and)
+        * [$or](#or)
+        * [$nor](#nor)
+        * [$not](#not)
 
 ## Database
+
+### #use()
+
+Before we can actually start creating or retrieving documents, we should select the database we wish to use. You should call the ```use()``` method to change the selected database.
+
+```JavaScript
+var db = new MongoStorage();
+db.use('foo_dev');
+```
+
+This will load all the collections from the foo_dev database.
 
 ### #createCollection()
 
@@ -10,6 +49,7 @@ To create a new collection, you should call the ```createCollection()``` method 
 
 ```JavaScript
 var db = new MongoStorage();
+db.use('foo_dev');
 db.createCollection('users');
 ```
 
@@ -154,3 +194,43 @@ db.users.drop(function() {
     // The users collection has been removed
 });
 ```
+
+## Query Operators
+
+### Comparison query operators
+For comparison of different type values.
+
+#### $gt
+Matches values that are greater than the value specified in the query.
+
+#### $gte
+Matches values that are greater than or equal to the value specified in the query.
+
+#### $lt
+Matches values that are less than the value specified in the query.
+
+#### $lte
+Matches values that are less than or equal to the value specified in the query.
+
+#### $ne
+Matches all values that are not equal to the value specified in the query.
+
+#### $in
+Matches any of the values that exist in an array specified in the query.
+
+#### $nin
+Matches values that do not exist in an array specified to the query.
+
+### Logical query operators
+
+#### $and
+Joins query clauses with a logical AND returns all documents that match the conditions of both clauses.
+
+#### $or
+Joins query clauses with a logical OR returns all documents that match the conditions of either clause.
+
+#### $nor
+Joins query clauses with a logical NOR returns all documents that fail to match both clauses.
+
+#### $not
+Inverts the effect of a query expression and returns documents that do not match the query expression.
