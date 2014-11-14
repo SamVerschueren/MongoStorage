@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+
+    <title>MongoStorage tests</title>
+
+    <link rel="stylesheet" media="all" href="vendor/mocha.css">
+
+    <!-- Testing files -->
+    <script type="text/javascript" src="vendor/mocha.js"></script>
+    <script type="text/javascript" src="vendor/chai.js"></script>
+
+    <!-- Library files -->
+    <script type="text/javascript" src="../src/lodash.min.js"></script>
+    <script type="text/javascript" src="../build/MongoStorage.min.js"></script>
+</head>
+<body>
+    <div id="mocha"></div>
+    <div id="messages"></div>
+    <div id="fixtures"></div>
+
+    <script type="text/javascript">
+        // Setup mocha
+        mocha.setup('bdd');
+    </script>
+
+    <!-- Load the test script -->
+    <script type="text/javascript" src="test.js"></script>
+
+    <script type="text/javascript">
+        // Run the tests
+        mocha.run();
+    </script>
+</body>
+</html>
