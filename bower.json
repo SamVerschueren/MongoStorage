@@ -16,6 +16,8 @@
   "license": "MIT",
   "ignore": [
     "test",
-    "src"
+    "src",
+    "Gruntfile.js",
+    "package.json"
   ]
 }
