@@ -2,6 +2,14 @@
 
 This library is work-in-progress for a client-side MongoDB implementation.
 
+## Bower
+
+Install using [bower](http://bower.io/)
+
+```
+bower install mongostorage
+```
+
 ## Table of contents
 
 * [Database](#database)
