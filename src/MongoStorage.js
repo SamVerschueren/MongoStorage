@@ -1,6 +1,6 @@
 /**
  * This class represents the mongo database.
- * 
+ *
  * @author Sam Verschueren      <sam.verschueren@gmail.com>
  * @since  24 Oct. 2014
  */
@@ -17,16 +17,14 @@ var MongoStorage = (function() {
      * Creates the database
      */
     function MongoStorage() {
-        
-    };
+
+    }
 
     MongoStorage.prototype.use = function(database) {
         this._database = database;
 
         for(var name in window.localStorage) {
             if(name.indexOf(this._database) === 0) {
-                console.log(name.substring(this._database.length+1));
-
                 this[name.substring(this._database.length+1)] = new Collection(name, window.localStorage.getObject(name));
             }
         }
@@ -34,7 +32,7 @@ var MongoStorage = (function() {
 
     /**
      * Creates a new collection in the database.
-     * 
+     *
      * @param  String name The name of the collection.
      */
     MongoStorage.prototype.createCollection = function(name) {
