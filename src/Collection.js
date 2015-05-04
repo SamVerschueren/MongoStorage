@@ -157,7 +157,7 @@ var Collection = (function() {
      * @param  Function callback An optional callback if the data is inserted.
      */
     Collection.prototype.insert = function(data, callback) {
-        var dataArray = data;
+        var dataArray = _.cloneDeep(data);
 
         if(!_.isArray(data)) {
             dataArray = [data];
