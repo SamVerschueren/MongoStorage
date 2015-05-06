@@ -15,7 +15,29 @@ describe('Database', function() {
     });
 
     describe('#use()', function() {
-        
+
+        beforeEach(function() {
+            db.use('test');
+            db.createCollection('users');
+            db.createCollection('settings');
+
+            db.use('testing');
+            db.createCollection('testingusers');
+        });
+
+        it('Should set the correct database', function() {
+            db.use('test');
+
+            expect(db._database).to.be.equal('test');
+        });
+
+        it('Should load the correct collections', function() {
+            db.use('test');
+
+            expect(db.users).to.exist;
+            expect(db.settings).to.exist;
+            expect(db.testingusers).to.not.exist;
+        });
     });
 
     describe('#createCollection()', function() {
@@ -47,6 +69,27 @@ describe('Database', function() {
 
             fn();
             expect(fn).to.throw;
+        });
+    });
+
+    describe('#dropCollection()', function() {
+
+        beforeEach(function() {
+            localStorage.clear();
+        });
+
+        it('Should throw an error if no database was selected', function() {
+            function fn() { db.createCollection('users'); };
+
+            expect(fn).to.throw;
+        });
+
+        it('Should drop the entire test collection', function() {
+            db.use('test');
+            db.createCollection('users');
+            db.dropDatabase();
+
+            expect(window.localStorage['test.users']).to.not.exist;
         });
     });
 });
@@ -171,7 +214,7 @@ describe('Collection', function() {
             it('Should return the number of deleted rows', function() {
                 db.users.remove(function(rows) {
                     expect(rows).to.be.equal(2);
-                });  
+                });
             });
         });
 
@@ -197,7 +240,7 @@ describe('Collection', function() {
                 {
                     firstName: 'Foo 1',
                     name: 'Bar'
-                }, 
+                },
                 {
                     firstName: 'Foo 2',
                     name: 'Bar'
@@ -379,7 +422,7 @@ describe('Query Operators', function() {
                 db.users.find({age: {$ne: 20}}, function(users) {
                     expect(users).to.have.length(3);
                 });
-            }); 
+            });
         });
 
         describe('$in', function() {
@@ -450,7 +493,7 @@ describe('Query Operators', function() {
             }
         ]);
          */
-        
+
         describe('$and', function() {
             it('Should return 1 user that swims and cycles', function() {
                 db.users.find({$and: [{hobbies: 'Swimming'}, {hobbies: 'Cycling'}]}, function(users) {
@@ -485,7 +528,7 @@ describe('Query Operators', function() {
                     expect(users).to.have.length(1);
                 });
             });
-        }); 
+        });
 
         describe('$not', function() {
             it('Should return 1 user with an age not greater than 20', function() {
