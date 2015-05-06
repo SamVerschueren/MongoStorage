@@ -49,7 +49,7 @@ var MongoStorage = (function() {
 
         var fullName = this._database + '.' + name;
 
-        if(window.localStorage.getObject(fullName) !== undefined) {
+        if(window.localStorage[fullName] !== undefined) {
             throw { errmsg: 'collection already exists', 'ok' : 0 };
         }
 
@@ -66,16 +66,38 @@ var MongoStorage = (function() {
             throw { errmsg: 'no database selected', 'ok': 0 };
         }
 
+        // Iterate over the collections and remove them
+        _.forEach(this.collections(), function(collection) {
+            delete window.localStorage[this._database + '.' + collection];
+        }, this);
+
+        // Clear the collections by selecting no database
+        this.use();
+    };
+
+    /**
+     * Returns an array of all the collections in the current database.
+     *
+     * @return {String[]}       Array of collections.
+     */
+    MongoStorage.prototype.collections = function() {
+        if(this._database === undefined) {
+            throw { errmsg: 'no database selected', 'ok': 0 };
+        }
+
+        var collections = [];
+
         // Iterate over all the storage properties
         for(var name in window.localStorage) {
-            if(name.split('.')[0] === this._database) {
+            var splitted = name.split('.');
+
+            if(splitted.shift() === this._database) {
                 // Remove the collection if it is part of the database
-                delete window.localStorage[name];
+                collections.push(splitted.join('.'));
             }
         }
 
-        // Clear the collections by selecting no database 
-        this.use();
+        return collections;
     };
 
     return MongoStorage;
