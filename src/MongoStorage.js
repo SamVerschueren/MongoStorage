@@ -73,6 +73,9 @@ var MongoStorage = (function() {
                 delete window.localStorage[name];
             }
         }
+
+        // Clear the collections by selecting no database 
+        this.use();
     };
 
     return MongoStorage;

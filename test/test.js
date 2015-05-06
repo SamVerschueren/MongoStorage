@@ -91,6 +91,22 @@ describe('Database', function() {
 
             expect(window.localStorage['test.users']).to.not.exist;
         });
+
+        it('Should not have the users collection anymore', function() {
+            db.use('test');
+            db.createCollection('users');
+            db.dropDatabase();
+
+            expect(db.users).to.not.exist;
+        });
+
+        it('Should not have a selected database anymore', function() {
+            db.use('test');
+            db.createCollection('users');
+            db.dropDatabase();
+
+            expect(db._database).to.be.equal(undefined);
+        });
     });
 });
 
