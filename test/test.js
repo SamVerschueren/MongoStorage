@@ -108,6 +108,37 @@ describe('Database', function() {
             expect(db._database).to.be.equal(undefined);
         });
     });
+
+    describe('#collections()', function() {
+        beforeEach(function() {
+            localStorage.clear();
+
+            db.use('test');
+            db.createCollection('users');
+            db.createCollection('settings');
+
+            db.use('testing');
+            db.createCollection('t-users');
+
+            db.use('test');
+        });
+
+        it('Should throw an error if no database was selected', function() {
+            function fn() { db.collections(); };
+
+            db.use();
+
+            expect(fn).to.throw;
+        });
+
+        it('Should return two collections', function() {
+            expect(db.collections()).to.have.length(2);
+        });
+
+        it('Should return the correct collection', function() {
+            expect(db.collections()).to.be.eql(['settings', 'users']);
+        });
+    });
 });
 
 describe('Collection', function() {
