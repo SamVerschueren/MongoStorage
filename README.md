@@ -16,6 +16,7 @@ bower install mongostorage
     * [use()](#use)
     * [createCollection()](#createcollection)
     * [dropDatabase()](#dropdatabase)
+    * [collections()](#collections)
 * [Collection](#collection)
     * [insert()](#insert)
     * [update()](#update)
@@ -69,11 +70,15 @@ This will expose a new user property in the database that can be used to access 
 This will drop the current database.
 
 ```JavaScript
-var db = new MongoStorage();
-db.use('foo_dev');
-db.createCollection('users');
-
 db.dropDatabase();
+```
+
+### #collections()
+
+Retrieves the list of collections.
+
+```JavaScript
+db.collections();
 ```
 
 ## Collection
