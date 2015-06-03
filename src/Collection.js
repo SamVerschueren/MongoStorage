@@ -50,11 +50,13 @@ var Collection = (function() {
                 options = {};
             }
             
+            where = where || {};
+            options = options || {};
             callback = callback || noop;
     
             var filtered = _.filter(_.values(self._data), compileDocumentSelector(where));
     
-            if(options && options.sort) {
+            if(options.sort) {
                 filtered = filtered.sort(Collection._compileSort(options.sort));
             }
     
@@ -90,11 +92,13 @@ var Collection = (function() {
                 options = undefined;
             }
             
+            where = where || {};
+            options = options || {};
             callback = callback || noop;
     
             var filtered = _.filter(_.values(self._data), compileDocumentSelector(where));
     
-            if(options && options.sort) {
+            if(options.sort) {
                 filtered = filtered.sort(Collection._compileSort(options.sort));
             }
     
@@ -127,12 +131,13 @@ var Collection = (function() {
                 options = {};
             }
             
+            options = options || {};
             callback = callback || noop;
     
             var updatedDocuments = 0;
     
             self.find(query, function(documents) {
-                if(!options || !options.multi) {
+                if(!options.multi) {
                     // If multi is not set to true, only update the first record
                     documents = documents.length === 0 ? [] : [documents[0]];
                 }

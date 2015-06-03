@@ -1,6 +1,6 @@
 {
   "name": "MongoStorage",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "main": [
     "build/MongoStorage.min.js",
     "build/MongoStorage.min.js.map"
