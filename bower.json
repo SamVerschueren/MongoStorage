@@ -18,7 +18,7 @@
   "ignore": [
     "test",
     "src",
-    "Gruntfile.js",
+    "gulpfile.js",
     "package.json"
   ]
 }
