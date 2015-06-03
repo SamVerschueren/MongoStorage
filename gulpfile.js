@@ -13,6 +13,7 @@ var gulp = require('gulp'),
     uglify = require('gulp-uglify'),
     header = require('gulp-header'),
     sourcemaps = require('gulp-sourcemaps'),
+    rename = require('gulp-rename'),
     del = require('del'),
     moment = require('moment');
 
@@ -33,12 +34,28 @@ gulp.task('clean', function(cb) {
 });
 
 /**
+ * Concatenates all the files for the build.
+ */
+gulp.task('concat', ['clean'], function() {
+    return gulp.src([
+            'bower_components/promise-polyfill/Promise.min.js',
+            'src/Collection.js', 
+            'src/Collection.Modify.js', 
+            'src/Collection.Selector.js', 
+            'src/*.js', 
+            '!src/*.min.js'
+        ])
+        .pipe(concat(pkg.name + '.js'))
+        .pipe(gulp.dest('dist'));
+});
+
+/**
  * The build task concatenates and uglifies everything.
  */
-gulp.task('build', ['clean'], function() {
-    return gulp.src(['src/Collection.js', 'src/Collection.Modify.js', 'src/Collection.Selector.js', 'src/*.js', '!src/*.min.js'])
+gulp.task('build', ['concat'], function() {
+    return gulp.src('dist/' + pkg.name + '.js')
         .pipe(sourcemaps.init())
-        .pipe(concat(pkg.name + '.min.js'))
+        .pipe(rename(pkg.name + '.min.js'))
         .pipe(uglify())
         .pipe(header(banner, {pkg: pkg}))
         .pipe(sourcemaps.write('.'))
